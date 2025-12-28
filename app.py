@@ -569,14 +569,14 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         function saveToHistory(query, result) {
         let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
     
-        // Yeni sorguyu ekle
+        // Yeni sorguyu ekleyelim
          history.unshift({
         timestamp: new Date().toISOString(),
         query: query,
         result: result
         });
     
-        // Sadece son 10 tanesini tut
+        // Sadece son 10 tanesini tutalım
          history = history.slice(0, MAX_HISTORY);
     
          localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
