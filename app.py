@@ -1135,3 +1135,4 @@ if __name__ == '__main__':
     print("   ✓ Excel export")
     print("\n⏹️  Durdurmak için: Ctrl+C")
     print("=" * 60 + "\n")
+#Kaan <3
