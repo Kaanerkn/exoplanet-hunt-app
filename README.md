@@ -1,10 +1,10 @@
-# 🪐 Exoplanet Hunt – Otomasyon ile Ötegezegen Tespiti
+# Exoplanet Hunt – Otomasyon ile Ötegezegen Tespiti
 
 Bu proje, **NASA’nın TESS ve Kepler açık verilerini** kullanarak **otomasyon tabanlı bir ötegezegen tespit sistemi** geliştirmeyi amaçlamaktadır. Sistem, transit yöntemine dayalı temel parametreleri analiz ederek potansiyel ötegezegen adaylarını belirler ve sonuçları otomatik olarak Excel dosyasına aktarır.
 
 ---
 
-## 🚀 Proje Amacı
+## Proje Amacı
 
 Bu çalışmanın temel amacı:
 
@@ -15,7 +15,21 @@ Bu çalışmanın temel amacı:
 
 ---
 
-## 🔬 Kullanılan Parametreler (TESS Verileri)
+## 🌐 Canlı Uygulama (Demo)
+
+Proje kapsamında geliştirilen ötegezegen tespit sistemi, web tabanlı bir arayüz üzerinden canlı olarak çalıştırılabilmektedir.
+
+🔗 **Canlı Uygulama Linki:**  
+https://exoplanet-hunt-app.onrender.com
+
+Bu arayüz üzerinden:
+- NASA TESS ve Kepler verileri otomatik olarak işlenir
+- Manuel giriş ile ötegezegen adayları değerlendirilebilir
+- Tespit edilen sonuçlar Excel dosyası olarak dışa aktarılır
+
+---
+
+## Kullanılan Parametreler (TESS Verileri)
 
 Ötegezegen adaylarının belirlenmesinde aşağıdaki **4 temel transit parametresi** kullanılmıştır:
 
@@ -28,7 +42,7 @@ Bu parametreler, bir gökcisminin yıldızının önünden geçiş yapıp yapmad
 
 ---
 
-## ⚙️ Metodoloji
+## Metodoloji
 
 1. **NASA Açık Veri Kaynağından Veri Çekme**  
    - TESS ve Kepler görevlerine ait veriler alınmıştır.
@@ -45,7 +59,7 @@ Bu parametreler, bir gökcisminin yıldızının önünden geçiş yapıp yapmad
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler
+## Kullanılan Teknolojiler
 
 - **Python**
 - **Jupyter Notebook**
@@ -56,8 +70,9 @@ Bu parametreler, bir gökcisminin yıldızının önünden geçiş yapıp yapmad
 
 ---
 
-## ▶️ Çalıştırma Adımları
+## Çalıştırma Adımları
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+
