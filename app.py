@@ -845,7 +845,7 @@ function loadQueryFromHistory(index) {
         }
 
         function createClassificationChart(data, targetId) {
-        // Sınıflandırma sayılarını hesapla
+        // Sınıflandırma sayılarını hesaplayalım
         const counts = {
         'CP': 0,
         'PC': 0,
