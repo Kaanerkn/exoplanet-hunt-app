@@ -15,13 +15,7 @@ Bu çalışmanın temel amacı:
 
 ---
 
-## 🌐 Canlı Uygulama (Demo)
-
-Proje kapsamında geliştirilen ötegezegen tespit sistemi, web tabanlı bir arayüz üzerinden canlı olarak çalıştırılabilmektedir.
-
-🔗 **Canlı Uygulama Linki:**  
-https://exoplanet-hunt-app.onrender.com
-
+## 🌐[Project Demo](https://exoplanet-hunt-app.onrender.com)
 Bu arayüz üzerinden:
 - NASA TESS ve Kepler verileri otomatik olarak işlenir
 - Manuel giriş ile ötegezegen adayları değerlendirilebilir
@@ -75,4 +69,5 @@ Bu parametreler, bir gökcisminin yıldızının önünden geçiş yapıp yapmad
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+
 
