@@ -576,7 +576,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         result: result
         });
     
-        // Sadece son 10 tanesini tut
+        // Sadece son 10 tanesini tutalım
          history = history.slice(0, MAX_HISTORY);
     
          localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
