@@ -495,7 +495,24 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             <button onclick="calculateScore()">🧮 Hesapla</button>
             <button onclick="clearManual()">🗑️ Temizle</button>
             <div id="manualResult"></div>
-        </div>
+
+<div id="manualHistory" style="margin-top:20px;">
+  <h3>🕘 Son 10 Manuel Sorgu</h3>
+  <table id="historyTable">
+    <thead>
+      <tr>
+        <th>Zaman</th>
+        <th>Periyot</th>
+        <th>Süre</th>
+        <th>Derinlik</th>
+        <th>Mag</th>
+        <th>Olasılık</th>
+        <th>Karar</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
 
         <div id="nasa" class="content">
             <h2>NASA ÖTEGEZEGEN ARŞİVİ</h2>
