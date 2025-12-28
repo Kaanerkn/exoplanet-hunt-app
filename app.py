@@ -495,24 +495,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             <button onclick="calculateScore()">🧮 Hesapla</button>
             <button onclick="clearManual()">🗑️ Temizle</button>
             <div id="manualResult"></div>
-
-<div id="manualHistory" style="margin-top:20px;">
-  <h3>🕘 Son 10 Manuel Sorgu</h3>
-  <table id="historyTable">
-    <thead>
-      <tr>
-        <th>Zaman</th>
-        <th>Periyot</th>
-        <th>Süre</th>
-        <th>Derinlik</th>
-        <th>Mag</th>
-        <th>Olasılık</th>
-        <th>Karar</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+        </div>
 
         <div id="nasa" class="content">
             <h2>NASA ÖTEGEZEGEN ARŞİVİ</h2>
@@ -593,173 +576,17 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             return names[label] || label;
         }
 
-        function normalizeStarMag(mag) {
-  // Python tarafındaki: max(0, min(1, 1 - star_mag/20))
-  return Math.max(0, Math.min(1, 1 - (mag / 20)));
-}
-function fPeriod(period) {
-  // Python: 1 if period < 30 else max(0, 1 - (period-30)/100)
-  if (period < 30) return 1;
-  return Math.max(0, 1 - ((period - 30) / 100));
-}
-function fDuration(duration) {
-  // Python: 1 if duration < 10 else max(0, 1 - (duration-10)/30)
-  if (duration < 10) return 1;
-  return Math.max(0, 1 - ((duration - 10) / 30));
-}
-function fDepth(depth) {
-  // Python: min(1, depth/500)
-  return Math.min(1, depth / 500);
-}
+        async function calculateScore() {
+            const period = parseFloat(document.getElementById('period').value);
+            const duration = parseFloat(document.getElementById('duration').value);
+            const depth = parseFloat(document.getElementById('depth').value);
+            const star_mag = parseFloat(document.getElementById('star_mag').value);
+            const source = document.getElementById('manualSource').value;
 
-function labelToDecision(label) {
-  // UI için daha anlaşılır
-  if (label === "CP") return "Candidate (Yüksek Güven)";
-  if (label === "PC") return "Candidate (Orta Güven)";
-  return "False Positive / Belirsiz";
-}
-
-function buildReasons(period, duration, depth, starMag) {
-  // 3 madde: hangi parametre skoru artırdı/azalttı
-  const parts = [
-    {
-      key: "periyot",
-      score: fPeriod(period),
-      textGood: `Periyot uygun (${period} gün)`,
-      textBad: `Periyot uzun (${period} gün)`
-    },
-    {
-      key: "süre",
-      score: fDuration(duration),
-      textGood: `Transit süresi uygun (${duration} saat)`,
-      textBad: `Transit süresi uzun (${duration} saat)`
-    },
-    {
-      key: "derinlik",
-      score: fDepth(depth),
-      textGood: `Transit derinliği güçlü (${depth} ppm)`,
-      textBad: `Transit derinliği zayıf (${depth} ppm)`
-    },
-    {
-      key: "parlaklık",
-      score: normalizeStarMag(starMag),
-      textGood: `Yıldız parlaklığı uygun (Mag ${starMag})`,
-      textBad: `Yıldız çok sönük (Mag ${starMag})`
-    }
-  ];
-
-  // en etkili 3 taneyi seç
-  parts.sort((a, b) => b.score - a.score);
-  const top = parts.slice(0, 3).map(p => (p.score >= 0.6 ? p.textGood : p.textBad));
-  return top;
-}
-
-function showManualError(msg) {
-  const el = document.getElementById("manualResult");
-  el.innerHTML = `
-    <div style="padding:14px;border:1px solid rgba(255,255,255,.15);border-radius:12px;">
-      <div style="font-weight:700;">⚠️ Hata</div>
-      <div style="opacity:.9;margin-top:6px;">${msg}</div>
-    </div>
-  `;
-}
-
-function loadHistory() {
-  try { return JSON.parse(sessionStorage.getItem("manualHistory") || "[]"); }
-  catch { return []; }
-}
-function saveHistory(arr) {
-  sessionStorage.setItem("manualHistory", JSON.stringify(arr));
-}
-function renderHistory() {
-  const data = loadHistory();
-  const tbody = document.querySelector("#historyTable tbody");
-  if (!tbody) return;
-  tbody.innerHTML = data.map(item => `
-    <tr>
-      <td>${item.time}</td>
-      <td>${item.period}</td>
-      <td>${item.duration}</td>
-      <td>${item.depth}</td>
-      <td>${item.starMag}</td>
-      <td>${item.prob}</td>
-      <td>${item.decision}</td>
-    </tr>
-  `).join("");
-}
-
-async function calculateScore() {
-  const period = parseFloat(document.getElementById('period').value);
-  const duration = parseFloat(document.getElementById('duration').value);
-  const depth = parseFloat(document.getElementById('depth').value);
-  const star_mag = parseFloat(document.getElementById('star_mag').value);
-  const source = document.getElementById('manualSource').value;
-
-  // (3) Hata yakalama: boş / negatif / 0
-  if ([period, duration, depth, star_mag].some(v => Number.isNaN(v))) {
-    showManualError("Lütfen tüm alanları doldur.");
-    return;
-  }
-  if (period <= 0 || duration <= 0 || depth <= 0 || star_mag <= 0) {
-    showManualError("Değerler 0’dan büyük olmalı. (Negatif/0 değer kabul edilmez)");
-    return;
-  }
-
-  try {
-    const response = await fetch('/api/calculate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ period, duration, depth, star_mag, source })
-    });
-
-    if (!response.ok) throw new Error('Hesaplama hatası');
-
-    const data = await response.json();
-
-    const prob = Number(data.score).toFixed(1); // yüzde gibi gösteriyoruz
-    const decision = labelToDecision(data.label);
-    const reasons = buildReasons(period, duration, depth, star_mag);
-
-    // (2) Sonuç ekranını netleştir
-    document.getElementById('manualResult').innerHTML = `
-      <div style="padding:16px;border:1px solid rgba(255,255,255,.15);border-radius:14px;">
-        <div style="font-size:18px;font-weight:800;">Gezegen olma olasılığı: <span style="color:#8be9fd;">%${prob}</span></div>
-        <div style="margin-top:8px;font-weight:700;">Karar: <span style="color:#b8ffb8;">${decision}</span></div>
-        <div style="margin-top:10px;opacity:.9;">
-          <div style="font-weight:700;margin-bottom:6px;">Nedenler:</div>
-          <ul style="margin:0;padding-left:18px;">
-            ${reasons.map(r => `<li>${r}</li>`).join("")}
-          </ul>
-        </div>
-      </div>
-    `;
-
-    // (4) Son 10 sorgu: sessionStorage’a yaz + tabloya bas
-    const now = new Date();
-    const timeStr = now.toLocaleString();
-
-    const history = loadHistory();
-    history.unshift({
-      time: timeStr,
-      period: period,
-      duration: duration,
-      depth: depth,
-      starMag: star_mag,
-      prob: `%${prob}`,
-      decision: decision
-    });
-    const sliced = history.slice(0, 10);
-    saveHistory(sliced);
-    renderHistory();
-
-  } catch (err) {
-    showManualError("Bir şeyler ters gitti. Lütfen tekrar dene.");
-  }
-}
-
-// Sayfa açılınca tabloyu doldursun
-window.addEventListener("load", renderHistory);
-
+            if (isNaN(period) || isNaN(duration) || isNaN(depth) || isNaN(star_mag)) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
+            }
 
             try {
                 const response = await fetch('/api/calculate', {
@@ -1071,19 +898,6 @@ window.addEventListener("load", renderHistory);
                 alert('Dışa aktarma hatası: ' + error.message);
             }
         }
-    // 🔧 HTML onclick'lerin çalışması için fonksiyonları globale açıyoruz
-window.calculateScore = calculateScore;
-window.clearManual = clearManual;
-window.showTab = showTab;
-window.showManualError = showManualError;
-window.renderHistory = renderHistory;
-
-// varsa diğer butonlar için
-window.fetchNasaAuto = fetchNasaAuto;
-window.exportResults = exportResults;
-window.clearNasa = clearNasa;
-window.clearFile = clearFile;
-
     </script>
 </body>
 </html>'''
