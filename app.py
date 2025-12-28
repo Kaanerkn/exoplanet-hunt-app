@@ -1,6 +1,5 @@
-# EXOPLANET HUNT - Unified Application
+# ÖTEGEZEGEN TESPİT PLATFORMU
 # Created by Hızır Kaan ERKAN, Fatma YALÇIN, Sefa GAKÇI, İrem ARIOĞLU
-# Tek dosyalı tam özellikli web uygulaması
 
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
@@ -13,11 +12,11 @@ import io
 app = Flask(__name__)
 CORS(app)
 
-# NASA API Configuration
+# NASA API URL
 NASA_API_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync"
 
 
-# Scoring Functions
+# Fonksiyonlar
 def normalize_star_mag(mag, source):
     try:
         mag = float(mag)
@@ -31,7 +30,7 @@ def normalize_star_mag(mag, source):
             # Kepler magnitude (KepMag)
             return max(0.0, min(1.0, (14.0 - mag) / 6.0))
         elif source == 'file':
-            # Unknown source → conservative normalization
+            # Bilinmeyen Veriler
             return max(0.0, min(1.0, (13.5 - mag) / 6.0))
         return None
     except:
@@ -55,11 +54,11 @@ def calculate_score(period, duration, depth, star_mag, source='toi'):
         period = float(period)
         duration = float(duration)
 
-        # Kepler için duration günden saate çevir
+        # Kepler için duration günden saate çevirme
         if source == 'koi':
             duration *= 24.0
 
-        # Kepler için depth çok küçük olabilir (0-1 arası), ppm'e çevir
+        # Kepler için depth çok küçük olabilir (0-1 arası), ppm'e çevirme
         if source == 'koi' and depth < 1:
             depth *= 1e6
 
@@ -108,7 +107,6 @@ def safe_float(x):
 
 
 def find_columns(df):
-    """Esnek kolon bulma - çeşitli isimlendirmeleri destekler"""
     col_map = {}
     columns_lower = {col.lower().strip(): col for col in df.columns}
 
@@ -159,7 +157,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exoplanet Hunt - NASA Exoplanet Archive Analyze</title>
+    <title>ÖTEGEZEGEN TESPİT PLATFORMU - NASA Ötegezegen Arşivi Analizi</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -272,7 +270,6 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .form-group { margin-bottom: 20px; }
 
         label {
@@ -466,36 +463,38 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             <div class="tab" onclick="showTab('nasa', this)">🛰️ NASA Arşiv Analizi</div>
             <div class="tab" onclick="showTab('file', this)">📁 Dosya Analizi</div>
         </div>
-
+        
         <div id="manual" class="content active">
-            <h2>Manuel Gezegen Verisi Girişi</h2>
-            <div class="form-group">
-                <label>Yörünge Periyodu (gün)</label>
-                <input type="number" id="period" step="0.01" placeholder="Örn: 3.5">
-            </div>
-            <div class="form-group">
-                <label>Transit Süresi (saat)</label>
-                <input type="number" id="duration" step="0.01" placeholder="Örn: 2.3">
-            </div>
-            <div class="form-group">
-                <label>Transit Derinliği (ppm)</label>
-                <input type="number" id="depth" step="1" placeholder="Örn: 850">
-            </div>
-            <div class="form-group">
-                <label>Yıldız Parlaklığı (Mag)</label>
-                <input type="number" id="star_mag" step="0.01" placeholder="Örn: 11.5">
-            </div>
-            <div class="form-group">
-                <label>Veri Kaynağı</label>
-                <select id="manualSource">
-                    <option value="toi">TESS (TOI)</option>
-                    <option value="koi">Kepler (KOI)</option>
-                </select>
-            </div>
-            <button onclick="calculateScore()">🧮 Hesapla</button>
-            <button onclick="clearManual()">🗑️ Temizle</button>
-            <div id="manualResult"></div>
-        </div>
+    <h2>Manuel Gezegen Verisi Girişi</h2>
+    <div class="form-group">
+        <label>Yörünge Periyodu (gün)</label>
+        <input type="number" id="period" step="0.01" placeholder="Örn: 3.5">
+    </div>
+    <div class="form-group">
+        <label>Transit Süresi (saat)</label>
+        <input type="number" id="duration" step="0.01" placeholder="Örn: 2.3">
+    </div>
+    <div class="form-group">
+        <label>Transit Derinliği (ppm)</label>
+        <input type="number" id="depth" step="1" placeholder="Örn: 850">
+    </div>
+    <div class="form-group">
+        <label>Yıldız Parlaklığı (Mag)</label>
+        <input type="number" id="star_mag" step="0.01" placeholder="Örn: 11.5">
+    </div>
+    <div class="form-group">
+        <label>Veri Kaynağı</label>
+        <select id="manualSource">
+            <option value="toi">TESS (TOI)</option>
+            <option value="koi">Kepler (KOI)</option>
+        </select>
+    </div>
+    <button onclick="calculateScore()">🧮 Hesapla</button>
+    <button onclick="clearManual()">🗑️ Temizle</button>
+    <div id="manualResult"></div>
+    
+    <div id="queryHistory" style="margin-top: 30px; padding: 20px; background: rgba(0, 0, 0, 0.2); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);"></div>
+</div>
 
         <div id="nasa" class="content">
             <h2>NASA ÖTEGEZEGEN ARŞİVİ</h2>
@@ -560,6 +559,131 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         }
         createStars();
 
+        window.addEventListener('DOMContentLoaded', function() {
+        displayHistory();
+        });
+        // Sorgu geçmişi için localStorage kullanımı
+        const HISTORY_KEY = 'exoplanet_query_history';
+        const MAX_HISTORY = 10;
+
+        function saveToHistory(query, result) {
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    
+        // Yeni sorguyu ekle
+         history.unshift({
+        timestamp: new Date().toISOString(),
+        query: query,
+        result: result
+        });
+    
+        // Sadece son 10 tanesini tut
+         history = history.slice(0, MAX_HISTORY);
+    
+         localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+            }
+
+        function loadHistory() {
+        return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+            }
+
+        function clearHistory() {
+        localStorage.removeItem(HISTORY_KEY);
+        displayHistory();
+            }
+
+        function displayHistory() {
+        const history = loadHistory();
+        const historyDiv = document.getElementById('queryHistory');
+    
+        if (history.length === 0) {
+        historyDiv.innerHTML = '<p style="color: #aaa; text-align: center;">Henüz sorgu geçmişi yok</p>';
+        return;
+        }
+    
+        let html = '<h4 style="color: #00d4ff; margin-bottom: 15px;">📋 Son 10 Sorgu</h4>';
+        html += '<div style="max-height: 400px; overflow-y: auto;">';
+    
+        history.forEach((item, index) => {
+        const date = new Date(item.timestamp);
+        const timeStr = date.toLocaleString('tr-TR');
+        
+        html += `
+            <div class="history-item" onclick="loadQueryFromHistory(${index})" style="
+                background: rgba(0, 0, 0, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                padding: 12px;
+                margin-bottom: 10px;
+                cursor: pointer;
+                transition: all 0.3s;
+            " onmouseover="this.style.background='rgba(0, 212, 255, 0.1)'; this.style.borderColor='#00d4ff'" 
+               onmouseout="this.style.background='rgba(0, 0, 0, 0.3)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #00d4ff; font-weight: 600;">Sorgu ${index + 1}</span>
+                    <span style="color: #aaa; font-size: 0.9em;">${timeStr}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 0.9em;">
+                    <div><strong>Periyot:</strong> ${item.query.period} gün</div>
+                    <div><strong>Süre:</strong> ${item.query.duration} saat</div>
+                    <div><strong>Derinlik:</strong> ${item.query.depth} ppm</div>
+                    <div><strong>Parlaklık:</strong> ${item.query.star_mag}</div>
+                </div>
+                <div style="margin-top: 8px; text-align: center;">
+                    <span style="color: #fff; font-weight: bold;">Skor: ${item.result.score}</span>
+                    <span class="label-badge label-${item.result.label}" style="margin-left: 10px; font-size: 0.85em;">${item.result.label}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    html += '<button onclick="clearHistory()" style="margin-top: 15px; background: rgba(255, 0, 0, 0.5);">🗑️ Geçmişi Temizle</button>';
+    
+    historyDiv.innerHTML = html;
+}
+
+function loadQueryFromHistory(index) {
+    const history = loadHistory();
+    const item = history[index];
+    
+    if (item) {
+        document.getElementById('period').value = item.query.period;
+        document.getElementById('duration').value = item.query.duration;
+        document.getElementById('depth').value = item.query.depth;
+        document.getElementById('star_mag').value = item.query.star_mag;
+        document.getElementById('manualSource').value = item.query.source;
+        
+        // Sonucu göster
+        document.getElementById('manualResult').innerHTML = `
+            <div class="result-card">
+                <h3>Sonuç (Geçmişten Yüklendi)</h3>
+                <div class="score-display">${item.result.score}</div>
+                <div style="text-align: center;">
+                    <span class="label-badge label-${item.result.label}">${getLabelName(item.result.label)}</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${item.result.period}</div>
+                        <div class="stat-label">Periyot (gün)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${item.result.duration}</div>
+                        <div class="stat-label">Süre (saat)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${item.result.depth}</div>
+                        <div class="stat-label">Derinlik (ppm)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${item.result.star_mag}</div>
+                        <div class="stat-label">Parlaklık (Mag)</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('manual').scrollIntoView({ behavior: 'smooth' });
+    }
+}
         function showTab(tabName, el) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
@@ -575,30 +699,35 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             };
             return names[label] || label;
         }
+                async function calculateScore() {
+    const period = parseFloat(document.getElementById('period').value);
+    const duration = parseFloat(document.getElementById('duration').value);
+    const depth = parseFloat(document.getElementById('depth').value);
+    const star_mag = parseFloat(document.getElementById('star_mag').value);
+    const source = document.getElementById('manualSource').value;
 
-        async function calculateScore() {
-            const period = parseFloat(document.getElementById('period').value);
-            const duration = parseFloat(document.getElementById('duration').value);
-            const depth = parseFloat(document.getElementById('depth').value);
-            const star_mag = parseFloat(document.getElementById('star_mag').value);
-            const source = document.getElementById('manualSource').value;
+    if (isNaN(period) || isNaN(duration) || isNaN(depth) || isNaN(star_mag)) {
+        alert('Lütfen tüm alanları doldurun!');
+        return;
+    }
 
-            if (isNaN(period) || isNaN(duration) || isNaN(depth) || isNaN(star_mag)) {
-                alert('Lütfen tüm alanları doldurun!');
-                return;
-            }
+    try {
+        const response = await fetch('/api/calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ period, duration, depth, star_mag, source })
+        });
 
-            try {
-                const response = await fetch('/api/calculate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ period, duration, depth, star_mag, source })
-                });
+        if (!response.ok) throw new Error('Hesaplama hatası');
 
-                if (!response.ok) throw new Error('Hesaplama hatası');
-
-                const data = await response.json();
-
+        const data = await response.json();
+        
+        saveToHistory(
+            { period, duration, depth, star_mag, source },
+            data
+        );
+        
+        displayHistory();
                 document.getElementById('manualResult').innerHTML = `
                     <div class="result-card">
                         <h3>Sonuç</h3>
@@ -633,14 +762,14 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
             }
         }
 
-        function clearManual() {
-            document.getElementById('period').value = '';
-            document.getElementById('duration').value = '';
-            document.getElementById('depth').value = '';
-            document.getElementById('star_mag').value = '';
-            document.getElementById('manualResult').innerHTML = '';
-        }
-
+            function clearManual() {
+                document.getElementById('period').value = '';
+                document.getElementById('duration').value = '';
+                document.getElementById('depth').value = '';
+                document.getElementById('star_mag').value = '';
+                document.getElementById('manualResult').innerHTML = '';
+                document.getElementById('manualSource').value = 'toi';
+                }
         async function fetchNasaAuto() {
             const btn = document.getElementById('nasaBtn');
             btn.disabled = true;
@@ -727,7 +856,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         counts[row.label]++;
         });
     
-        // Canvas oluştur
+        // Canvas oluşturma
          const canvasId = `chart-${targetId}`;
         const chartHtml = `
         <div class="chart-container">
@@ -804,7 +933,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
                 }
                 
         function displayResults(targetId, data, stats) {
-         // Grafik verilerini hazırla
+         // Grafik verileri
         const chartData = createClassificationChart(data, targetId);
     
         let html = `
@@ -865,7 +994,7 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
         html += `</tbody></table></div></div>`;
         document.getElementById(targetId).innerHTML = html;
     
-            // Grafik render et (DOM'a eklendikten sonra)
+            // Grafik render 
             setTimeout(() => renderChart(chartData.canvasId, chartData.counts), 100);
             }
         async function exportResults(type) {
@@ -924,7 +1053,7 @@ def analyze_file():
 
         col_mapping = find_columns(df)
 
-        # 🔍 Otomatik kaynak algılama (TOI / KOI)
+        #Otomatik kaynak algılama sistemi (TOI / KOI)
         if source == 'file':
             cols = [c.lower() for c in df.columns]
 
@@ -1123,15 +1252,15 @@ def nasa_auto():
 
 if __name__ == '__main__':
     print("\n" + "=" * 60)
-    print("    🌌 EXOPLANET HUNT - Unified Application")
+    print("    🛰️ ÖTEGEZEGEN TESPİT PLATFORMU")
     print("=" * 60)
     print("\n📌 Geliştirici: Hızır Kaan ERKAN, Fatma YALÇIN, Sefa GAKÇI, İrem ARIOĞLU")
     print("\n🚀 Server başlatılıyor...")
     print("🌐 URL: http://localhost:5000")
     print("\n💡 Özellikler:")
     print("   ✓ Manuel veri girişi")
-    print("   ✓ NASA Exoplanet Archive Analyze (TESS + Kepler)")
+    print("   ✓ NASA Ötegezegen Arşivi Analizi (TESS + Kepler)")
     print("   ✓ CSV/Excel dosya analizi")
-    print("   ✓ Excel export")
+    print("   ✓ Excel çıktısı")
     print("\n⏹️  Durdurmak için: Ctrl+C")
     print("=" * 60 + "\n")
