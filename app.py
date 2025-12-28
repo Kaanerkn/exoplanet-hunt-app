@@ -1248,7 +1248,14 @@ def nasa_auto():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+---
 
+## 👥 Proje Ekibi
+
+- **Hızır Kaan Erkan** – Havacılık ve Uzay Mühendisliği  
+- **Fatma Yalçın**  
+- **Sefa Gakçı**
+- **İrem Arıoğlu**
 
 if __name__ == '__main__':
     print("\n" + "=" * 60)
