@@ -55,9 +55,11 @@ Bu parametreler, bir gökcisminin yıldızının önünden geçiş yapıp yapmad
 - **Web tabanlı arayüz (otomasyon sistemi)**
 
 ---
-
+##
 ## ▶️ Çalıştırma Adımları
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+
+
