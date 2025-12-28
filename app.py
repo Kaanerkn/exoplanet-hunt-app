@@ -1071,6 +1071,19 @@ window.addEventListener("load", renderHistory);
                 alert('Dışa aktarma hatası: ' + error.message);
             }
         }
+    // 🔧 HTML onclick'lerin çalışması için fonksiyonları globale açıyoruz
+window.calculateScore = calculateScore;
+window.clearManual = clearManual;
+window.showTab = showTab;
+window.showManualError = showManualError;
+window.renderHistory = renderHistory;
+
+// varsa diğer butonlar için
+window.fetchNasaAuto = fetchNasaAuto;
+window.exportResults = exportResults;
+window.clearNasa = clearNasa;
+window.clearFile = clearFile;
+
     </script>
 </body>
 </html>'''
