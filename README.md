@@ -23,14 +23,14 @@ Bu arayüz üzerinden:
 
 ---
 
-## Kullanılan Parametreler (TESS Verileri)
+## Kullanılan Parametreler 
 
 Ötegezegen adaylarının belirlenmesinde aşağıdaki **4 temel transit parametresi** kullanılmıştır:
 
 - **Yörünge Periyodu (Orbital Period)**  
 - **Transit Süresi (Transit Duration)**  
 - **Transit Derinliği (Transit Depth)**  
-- **TESS Büyüklüğü (TESS Magnitude)**  
+- **Yıldız Parlaklığı**  
 
 Bu parametreler, bir gökcisminin yıldızının önünden geçiş yapıp yapmadığını ve gezegen olma ihtimalini değerlendirmek için kullanılmıştır.
 
@@ -69,5 +69,6 @@ Bu parametreler, bir gökcisminin yıldızının önünden geçiş yapıp yapmad
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+
 
 
